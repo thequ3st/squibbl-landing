@@ -7,168 +7,158 @@
 <style>
   body {
     font-family: Arial, sans-serif;
-    background: #0d1117;
-    color: #c9d1d9;
+    background: #f4f4f4;
     margin: 0;
-    padding: 0;
+    padding: 20px;
   }
-  header {
+
+  h1 {
     text-align: center;
-    padding: 2rem 1rem;
+    margin-bottom: 30px;
   }
-  h1 { margin: 0; font-size: 2.5rem; }
-  .services {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  .card {
-    background: #161b22;
+
+  .service {
+    background: #fff;
     border-radius: 8px;
-    padding: 1rem;
-    width: 260px;
-    text-align: center;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  .card h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
-  canvas { width: 100%; height: 50px; background: #0d1117; border-radius: 4px; display: block; margin: 0 auto 0.5rem auto; }
-  #last-checked { text-align: center; padding: 1rem; font-size: 0.9rem; color: #8b949e; }
-  a { color: #58a6ff; text-decoration: none; }
-  a:hover { text-decoration: underline; }
+
+  .service-name {
+    font-weight: bold;
+    flex: 1;
+  }
+
+  .status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    vertical-align: middle;
+    background-color: grey;
+  }
+
+  .uptime {
+    margin-left: 8px;
+    font-size: 0.85em;
+    color: #333;
+  }
+
+  canvas {
+    width: 300px;
+    height: 50px;
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Squibbl Services Dashboard</h1>
-  <p>Quick status overview of all services</p>
-</header>
+<h1>Squibbl Services</h1>
 
-<div class="services">
-  <div class="card">
-    <h2>Jellyfin</h2>
-    <canvas id="jellyfin-graph"></canvas>
-    <a href="https://jellyfin.squibbl.com" target="_blank">Open</a>
-  </div>
-  <div class="card">
-    <h2>Plex</h2>
-    <canvas id="plex-graph"></canvas>
-    <a href="https://plex.squibbl.com" target="_blank">Open</a>
-  </div>
-  <div class="card">
-    <h2>Wizarr</h2>
-    <canvas id="wizarr-graph"></canvas>
-    <a href="https://wizarr.squibbl.com" target="_blank">Open</a>
-  </div>
-  <div class="card">
-    <h2>Jellyseerr</h2>
-    <canvas id="jellyseerr-graph"></canvas>
-    <a href="https://jellyseerr.squibbl.com" target="_blank">Open</a>
-  </div>
+<div id="services-container">
+  <!-- Service blocks inserted via JS -->
 </div>
-
-<div id="last-checked">Last checked: --:--:--</div>
 
 <script>
 const services = [
-  { id:'jellyfin', url:'https://jellyfin.squibbl.com', history:[], timestamps:[] },
-  { id:'plex', url:'https://plex.squibbl.com', history:[], timestamps:[] },
-  { id:'wizarr', url:'https://wizarr.squibbl.com', history:[], timestamps:[] },
-  { id:'jellyseerr', url:'https://jellyseerr.squibbl.com', history:[], timestamps:[] }
+  { id: 'jellyfin', name: 'Jellyfin', history: [] },
+  { id: 'headphones', name: 'Headphones', history: [] },
+  { id: 'jellyseerr', name: 'Jellyseerr', history: [] },
+  { id: 'plex', name: 'Plex', history: [] },
+  { id: 'wizarr', name: 'Wizarr', history: [] }
 ];
 
-const maxPoints = 20;
+// Create service blocks
+const container = document.getElementById('services-container');
+services.forEach(service => {
+  const div = document.createElement('div');
+  div.className = 'service';
+  div.innerHTML = `
+    <span class="status-indicator" id="${service.id}-status"></span>
+    <span class="service-name">${service.name}</span>
+    <canvas id="${service.id}-graph" width="300" height="50"></canvas>
+    <span class="uptime" id="${service.id}-uptime"></span>
+  `;
+  container.appendChild(div);
+});
 
-const tooltip = document.createElement('div');
-tooltip.style.position='absolute';
-tooltip.style.background='rgba(0,0,0,0.8)';
-tooltip.style.color='white';
-tooltip.style.padding='4px 8px';
-tooltip.style.borderRadius='4px';
-tooltip.style.fontSize='12px';
-tooltip.style.pointerEvents='none';
-tooltip.style.display='none';
-document.body.appendChild(tooltip);
-
-function attachTooltip(service) {
-  const canvas = document.getElementById(`${service.id}-graph`);
-  canvas.addEventListener('mousemove', (e)=>{
-    const rect = canvas.getBoundingClientRect();
-    const i = Math.floor((e.clientX - rect.left)/(canvas.width/(service.history.length-1)));
-    if(service.timestamps[i]){
-      const time = service.timestamps[i].toLocaleTimeString();
-      const status = service.history[i] ? 'Online' : 'Offline';
-      tooltip.textContent = `${status} @ ${time}`;
-      tooltip.style.left = (e.pageX + 10) + 'px';
-      tooltip.style.top = (e.pageY + 10) + 'px';
-      tooltip.style.display = 'block';
-    }
-  });
-  canvas.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+// Function to simulate checking service (replace with real fetch/ping if you like)
+function checkService(service) {
+  // Random online/offline simulation for demo
+  const isOnline = Math.random() > 0.1 ? 1 : 0;
+  service.history.push(isOnline);
+  if(service.history.length > 24) service.history.shift(); // keep last 24 points
+  return isOnline;
 }
 
-async function checkStatus(service) {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(()=>controller.abort(), 3000);
-    await fetch(service.url, { mode:'no-cors', signal: controller.signal });
-    service.history.push(1);
-  } catch {
-    service.history.push(0);
-  }
-  service.timestamps.push(new Date());
-  if(service.history.length > maxPoints){ service.history.shift(); service.timestamps.shift(); }
+// Update UI for a service
+function updateServiceUI(service) {
+  // Status indicator
+  const statusEl = document.getElementById(`${service.id}-status`);
+  const lastStatus = service.history[service.history.length-1];
+  statusEl.style.backgroundColor = lastStatus ? '#28a745' : '#dc3545';
+
+  // Uptime %
+  const uptimePercent = ((service.history.filter(v => v).length / service.history.length) * 100).toFixed(0);
+  document.getElementById(`${service.id}-uptime`).innerText = `${uptimePercent}% uptime`;
+
+  // Draw graph
+  drawGraph(service);
 }
 
+// Draw graph
 function drawGraph(service) {
   const canvas = document.getElementById(`${service.id}-graph`);
   const ctx = canvas.getContext('2d');
   ctx.clearRect(0,0,canvas.width,canvas.height);
+
   if(service.history.length < 2) return;
 
-  const points = service.history.map((v,i)=>{
-    const x = i*(canvas.width/(service.history.length-1));
-    const y = canvas.height - v*canvas.height;
-    return {x,y};
-  });
+  const stepX = canvas.width / (service.history.length - 1);
 
+  // Smooth curve
   ctx.beginPath();
-  points.forEach((p,i)=>i===0?ctx.moveTo(p.x,canvas.height):ctx.lineTo(p.x,p.y));
-  ctx.lineTo(canvas.width,canvas.height);
-  ctx.closePath();
-  ctx.fillStyle='rgba(97,218,251,0.3)';
-  ctx.fill();
+  for(let i = 0; i < service.history.length; i++) {
+    const x = i * stepX;
+    const y = canvas.height - service.history[i] * canvas.height;
+    if(i===0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
 
-  ctx.beginPath();
-  points.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
-  ctx.strokeStyle='#61dafb';
-  ctx.lineWidth=2;
+  // Green line
+  ctx.strokeStyle = '#28a745';
+  ctx.lineWidth = 2;
   ctx.stroke();
 
-  service.history.forEach((v,i)=>{
-    if(v===0){
-      const x = i*(canvas.width/(service.history.length-1));
-      const w = canvas.width/(service.history.length-1);
-      ctx.fillStyle='rgba(255,0,0,0.3)';
-      ctx.fillRect(x,0,w,canvas.height);
+  // Red dots for offline points
+  for(let i=0;i<service.history.length;i++){
+    if(service.history[i]===0){
+      const x=i*stepX;
+      const y=canvas.height/2;
+      ctx.beginPath();
+      ctx.arc(x,y,3,0,Math.PI*2);
+      ctx.fillStyle='#dc3545';
+      ctx.fill();
     }
+  }
+}
+
+// Main loop to update all services
+function updateAllServices() {
+  services.forEach(service => {
+    checkService(service);
+    updateServiceUI(service);
   });
 }
 
-async function updateStatuses() {
-  for(const s of services){ await checkStatus(s); drawGraph(s); attachTooltip(s); }
-  document.getElementById('last-checked').textContent=`Last checked: ${new Date().toLocaleTimeString()}`;
-}
+// Initial update
+updateAllServices();
 
-function animate() {
-  services.forEach(drawGraph);
-  requestAnimationFrame(animate);
-}
-
-updateStatuses();
-setInterval(updateStatuses,15000);
-animate();
+// Update every 10 seconds
+setInterval(updateAllServices, 10000);
 </script>
 
 </body>
