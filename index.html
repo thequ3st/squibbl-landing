@@ -3,186 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squibbl Services Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<title>Squibbl Dashboard</title>
 <style>
   body {
-    font-family: 'Inter', sans-serif;
+    font-family: Arial, sans-serif;
+    background-color: #f0f2f5;
+    color: #333;
     margin: 0;
     padding: 0;
-    background: #121212;
-    color: #f0f0f0;
-    transition: background 0.3s, color 0.3s;
+    transition: background-color 0.3s, color 0.3s;
   }
-
-  body.light-mode {
-    background: #f9f9f9;
-    color: #222;
+  body.dark {
+    background-color: #121212;
+    color: #e0e0e0;
   }
-
   header {
+    padding: 1rem;
     text-align: center;
-    padding: 2rem 1rem;
-    background: #1f1f1f;
-    transition: background 0.3s;
   }
-
-  body.light-mode header {
-    background: #e0e0e0;
-  }
-
-  header h1 {
-    margin: 0;
-    font-size: 2rem;
-  }
-
-  #theme-toggle {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 6px;
+  .toggle-btn {
     cursor: pointer;
-    background: #444;
-    color: #f0f0f0;
-    transition: background 0.3s, color 0.3s;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+    border: none;
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 5px;
   }
-
-  body.light-mode #theme-toggle {
-    background: #ddd;
-    color: #222;
-  }
-
   .services {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
-    padding: 2rem 1rem;
-  }
-
-  .service-card {
-    background: #1f1f1f;
-    border-radius: 10px;
     padding: 1rem;
-    width: 220px;
+  }
+  .service-card {
+    width: 200px;
+    padding: 1rem;
+    border-radius: 10px;
+    background-color: #fff;
     text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
   }
-
-  body.light-mode .service-card {
-    background: #ffffff;
-    color: #222;
-  }
-
   .service-card:hover {
-    transform: translateY(-8px) scale(1.03);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   }
-
-  .service-card img {
-    width: 60px;
-    height: 60px;
+  body.dark .service-card {
+    background-color: #1f1f1f;
+  }
+  .service-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
     margin-bottom: 0.5rem;
   }
-
-  .status-dot {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
+  .service-name {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  .uptime-indicator {
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
-    margin-left: 0.5rem;
+    margin: 0 auto 0.5rem auto;
+    background-color: #ccc;
   }
-
-  .status-up {
-    background: #4caf50;
+  .service-graph {
+    height: 10px;
+    width: 100%;
+    border-radius: 5px;
+    background-color: #ccc;
   }
-
-  .status-down {
-    background: #f44336;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: 100px !important;
-    margin-top: 0.5rem;
-  }
-
-  footer {
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.9rem;
-    color: #888;
-  }
-
 </style>
 </head>
 <body>
-
 <header>
-  <h1>Squibbl Services Dashboard</h1>
-  <button id="theme-toggle">Toggle Light/Dark</button>
+  <h1>Squibbl Dashboard</h1>
+  <button class="toggle-btn" onclick="document.body.classList.toggle('dark')">Toggle Dark/Light</button>
 </header>
 
 <div class="services">
-  <div class="service-card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Jellyfin_logo.svg" alt="Jellyfin Logo">
-    <h3>Jellyfin <span class="status-dot status-up" id="status-jellyfin"></span></h3>
-    <canvas id="chart-jellyfin"></canvas>
+  <div class="service-card" onclick="window.open('https://jellyfin.squibbl.com','_blank')">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Jellyfin_-_icon-transparent.svg" class="service-logo" alt="Jellyfin Logo">
+    <div class="service-name">Jellyfin</div>
+    <div id="uptime-jellyfin" class="uptime-indicator"></div>
+    <div id="graph-jellyfin" class="service-graph"></div>
   </div>
-  <div class="service-card">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Plex_Logo.svg" alt="Plex Logo">
-    <h3>Plex <span class="status-dot status-up" id="status-plex"></span></h3>
-    <canvas id="chart-plex"></canvas>
+
+  <div class="service-card" onclick="window.open('https://plex.squibbl.com','_blank')">
+    <img src="https://wiki.mrmc.tv/images/c/cf/Plex_icon.png" class="service-logo" alt="Plex Logo">
+    <div class="service-name">Plex</div>
+    <div id="uptime-plex" class="uptime-indicator"></div>
+    <div id="graph-plex" class="service-graph"></div>
   </div>
-  <div class="service-card">
-    <img src="https://jellyseerr.com/assets/img/logo.svg" alt="Jellyseerr Logo">
-    <h3>Jellyseerr <span class="status-dot status-up" id="status-jellyseerr"></span></h3>
-    <canvas id="chart-jellyseerr"></canvas>
+
+  <div class="service-card" onclick="window.open('https://jellyseerr.squibbl.com','_blank')">
+    <img src="https://cdn.jsdelivr.net/gh/selfhst/icons/webp/jellyseerr.webp" class="service-logo" alt="Jellyseerr Logo">
+    <div class="service-name">Jellyseerr</div>
+    <div id="uptime-jellyseerr" class="uptime-indicator"></div>
+    <div id="graph-jellyseerr" class="service-graph"></div>
   </div>
-  <div class="service-card">
-    <img src="https://wizarr.xyz/logo.png" alt="Wizarr Logo">
-    <h3>Wizarr <span class="status-dot status-up" id="status-wizarr"></span></h3>
-    <canvas id="chart-wizarr"></canvas>
+
+  <div class="service-card" onclick="window.open('https://wizarr.squibbl.com','_blank')">
+    <img src="https://github.com/wizarrrr/wizarr/blob/main/app/static/wizarr-logo.png?raw=true" class="service-logo" alt="Wizarr Logo">
+    <div class="service-name">Wizarr</div>
+    <div id="uptime-wizarr" class="uptime-indicator"></div>
+    <div id="graph-wizarr" class="service-graph"></div>
   </div>
 </div>
 
-<footer>Squibbl Dashboard &copy; 2025</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Theme toggle
-  const themeToggle = document.getElementById('theme-toggle');
-  themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('light-mode');
-  });
+const services = [
+  {name:'jellyfin', url:'https://jellyfin.squibbl.com'},
+  {name:'plex', url:'https://plex.squibbl.com'},
+  {name:'jellyseerr', url:'https://jellyseerr.squibbl.com'},
+  {name:'wizarr', url:'https://wizarr.squibbl.com'}
+];
 
-  // Simulated uptime data (replace with real checks later)
-  const services = ['jellyfin', 'plex', 'jellyseerr', 'wizarr'];
-  services.forEach(service => {
-    const ctx = document.getElementById(`chart-${service}`).getContext('2d');
-    const chart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: Array.from({length: 12}, (_, i) => `${i+1}h`),
-        datasets: [{
-          label: 'Uptime',
-          data: Array.from({length: 12}, () => Math.floor(Math.random() * 10) + 90),
-          borderColor: '#4caf50',
-          backgroundColor: 'rgba(76, 175, 80, 0.2)',
-          tension: 0.3,
-          fill: true
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: { legend: { display: false } },
-        scales: {
-          y: { beginAtZero: true, max: 100 }
-        }
-      }
-    });
-  });
+const uptimeData = {};
+services.forEach(s => uptimeData[s.name] = []);
 
+async function checkService(service) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    await fetch(service.url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
+    clearTimeout(timeout);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function updateStatus() {
+  for (let service of services) {
+    const status = await checkService(service);
+    const uptimeArr = uptimeData[service.name];
+    uptimeArr.push(status);
+    if (uptimeArr.length > 20) uptimeArr.shift();
+
+    const indicator = document.getElementById(`uptime-${service.name}`);
+    indicator.style.backgroundColor = status ? '#00cc66' : '#cc0000';
+
+    const graph = document.getElementById(`graph-${service.name}`);
+    const gradient = uptimeArr.map(up => up ? '#00cc66' : '#cc0000').join(',');
+    graph.style.background = `linear-gradient(90deg, ${gradient})`;
+  }
+}
+
+updateStatus();
+setInterval(updateStatus, 30000);
 </script>
 </body>
 </html>
