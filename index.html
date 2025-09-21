@@ -3,163 +3,186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squibbl Services</title>
+<title>Squibbl Services Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <style>
   body {
-    font-family: Arial, sans-serif;
-    background: #f4f4f4;
+    font-family: 'Inter', sans-serif;
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    background: #121212;
+    color: #f0f0f0;
+    transition: background 0.3s, color 0.3s;
   }
 
-  h1 {
+  body.light-mode {
+    background: #f9f9f9;
+    color: #222;
+  }
+
+  header {
     text-align: center;
-    margin-bottom: 30px;
+    padding: 2rem 1rem;
+    background: #1f1f1f;
+    transition: background 0.3s;
   }
 
-  .service {
-    background: #fff;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  body.light-mode header {
+    background: #e0e0e0;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 2rem;
+  }
+
+  #theme-toggle {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #444;
+    color: #f0f0f0;
+    transition: background 0.3s, color 0.3s;
+  }
+
+  body.light-mode #theme-toggle {
+    background: #ddd;
+    color: #222;
+  }
+
+  .services {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 2rem 1rem;
   }
 
-  .service-name {
-    font-weight: bold;
-    flex: 1;
+  .service-card {
+    background: #1f1f1f;
+    border-radius: 10px;
+    padding: 1rem;
+    width: 220px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
   }
 
-  .status-indicator {
+  body.light-mode .service-card {
+    background: #ffffff;
+    color: #222;
+  }
+
+  .service-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+  }
+
+  .service-card img {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 0.5rem;
+  }
+
+  .status-dot {
     display: inline-block;
     width: 12px;
     height: 12px;
     border-radius: 50%;
-    vertical-align: middle;
-    background-color: grey;
+    margin-left: 0.5rem;
   }
 
-  .uptime {
-    margin-left: 8px;
-    font-size: 0.85em;
-    color: #333;
+  .status-up {
+    background: #4caf50;
+  }
+
+  .status-down {
+    background: #f44336;
   }
 
   canvas {
-    width: 300px;
-    height: 50px;
+    width: 100% !important;
+    height: 100px !important;
+    margin-top: 0.5rem;
   }
+
+  footer {
+    text-align: center;
+    padding: 1rem;
+    font-size: 0.9rem;
+    color: #888;
+  }
+
 </style>
 </head>
 <body>
 
-<h1>Squibbl Services</h1>
+<header>
+  <h1>Squibbl Services Dashboard</h1>
+  <button id="theme-toggle">Toggle Light/Dark</button>
+</header>
 
-<div id="services-container">
-  <!-- Service blocks inserted via JS -->
+<div class="services">
+  <div class="service-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/9/9b/Jellyfin_logo.svg" alt="Jellyfin Logo">
+    <h3>Jellyfin <span class="status-dot status-up" id="status-jellyfin"></span></h3>
+    <canvas id="chart-jellyfin"></canvas>
+  </div>
+  <div class="service-card">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Plex_Logo.svg" alt="Plex Logo">
+    <h3>Plex <span class="status-dot status-up" id="status-plex"></span></h3>
+    <canvas id="chart-plex"></canvas>
+  </div>
+  <div class="service-card">
+    <img src="https://jellyseerr.com/assets/img/logo.svg" alt="Jellyseerr Logo">
+    <h3>Jellyseerr <span class="status-dot status-up" id="status-jellyseerr"></span></h3>
+    <canvas id="chart-jellyseerr"></canvas>
+  </div>
+  <div class="service-card">
+    <img src="https://wizarr.xyz/logo.png" alt="Wizarr Logo">
+    <h3>Wizarr <span class="status-dot status-up" id="status-wizarr"></span></h3>
+    <canvas id="chart-wizarr"></canvas>
+  </div>
 </div>
 
+<footer>Squibbl Dashboard &copy; 2025</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-const services = [
-  { id: 'jellyfin', name: 'Jellyfin', history: [] },
-  { id: 'headphones', name: 'Headphones', history: [] },
-  { id: 'jellyseerr', name: 'Jellyseerr', history: [] },
-  { id: 'plex', name: 'Plex', history: [] },
-  { id: 'wizarr', name: 'Wizarr', history: [] }
-];
-
-// Create service blocks
-const container = document.getElementById('services-container');
-services.forEach(service => {
-  const div = document.createElement('div');
-  div.className = 'service';
-  div.innerHTML = `
-    <span class="status-indicator" id="${service.id}-status"></span>
-    <span class="service-name">${service.name}</span>
-    <canvas id="${service.id}-graph" width="300" height="50"></canvas>
-    <span class="uptime" id="${service.id}-uptime"></span>
-  `;
-  container.appendChild(div);
-});
-
-// Function to simulate checking service (replace with real fetch/ping if you like)
-function checkService(service) {
-  // Random online/offline simulation for demo
-  const isOnline = Math.random() > 0.1 ? 1 : 0;
-  service.history.push(isOnline);
-  if(service.history.length > 24) service.history.shift(); // keep last 24 points
-  return isOnline;
-}
-
-// Update UI for a service
-function updateServiceUI(service) {
-  // Status indicator
-  const statusEl = document.getElementById(`${service.id}-status`);
-  const lastStatus = service.history[service.history.length-1];
-  statusEl.style.backgroundColor = lastStatus ? '#28a745' : '#dc3545';
-
-  // Uptime %
-  const uptimePercent = ((service.history.filter(v => v).length / service.history.length) * 100).toFixed(0);
-  document.getElementById(`${service.id}-uptime`).innerText = `${uptimePercent}% uptime`;
-
-  // Draw graph
-  drawGraph(service);
-}
-
-// Draw graph
-function drawGraph(service) {
-  const canvas = document.getElementById(`${service.id}-graph`);
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-
-  if(service.history.length < 2) return;
-
-  const stepX = canvas.width / (service.history.length - 1);
-
-  // Smooth curve
-  ctx.beginPath();
-  for(let i = 0; i < service.history.length; i++) {
-    const x = i * stepX;
-    const y = canvas.height - service.history[i] * canvas.height;
-    if(i===0) ctx.moveTo(x,y);
-    else ctx.lineTo(x,y);
-  }
-
-  // Green line
-  ctx.strokeStyle = '#28a745';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-
-  // Red dots for offline points
-  for(let i=0;i<service.history.length;i++){
-    if(service.history[i]===0){
-      const x=i*stepX;
-      const y=canvas.height/2;
-      ctx.beginPath();
-      ctx.arc(x,y,3,0,Math.PI*2);
-      ctx.fillStyle='#dc3545';
-      ctx.fill();
-    }
-  }
-}
-
-// Main loop to update all services
-function updateAllServices() {
-  services.forEach(service => {
-    checkService(service);
-    updateServiceUI(service);
+  // Theme toggle
+  const themeToggle = document.getElementById('theme-toggle');
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
   });
-}
 
-// Initial update
-updateAllServices();
+  // Simulated uptime data (replace with real checks later)
+  const services = ['jellyfin', 'plex', 'jellyseerr', 'wizarr'];
+  services.forEach(service => {
+    const ctx = document.getElementById(`chart-${service}`).getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Array.from({length: 12}, (_, i) => `${i+1}h`),
+        datasets: [{
+          label: 'Uptime',
+          data: Array.from({length: 12}, () => Math.floor(Math.random() * 10) + 90),
+          borderColor: '#4caf50',
+          backgroundColor: 'rgba(76, 175, 80, 0.2)',
+          tension: 0.3,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, max: 100 }
+        }
+      }
+    });
+  });
 
-// Update every 10 seconds
-setInterval(updateAllServices, 10000);
 </script>
-
 </body>
 </html>
