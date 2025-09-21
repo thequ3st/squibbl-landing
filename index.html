@@ -2,47 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Squibbl Hub</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Squibbl Services</title>
 <style>
   body {
-    font-family: 'Segoe UI', sans-serif;
-    background: #f5f5f5;
-    color: #333;
+    font-family: Arial, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    margin: 0;
+    padding: 0;
+  }
+  header {
     text-align: center;
-    padding-top: 50px;
+    padding: 2rem 1rem;
   }
-  h1 { font-size: 3em; margin-bottom: 0.2em; }
-  p { font-size: 1.2em; margin-bottom: 2em; }
-  .links a {
-    display: block;
-    margin: 10px auto;
-    padding: 12px 25px;
-    width: 200px;
-    background: #007acc;
-    color: white;
-    text-decoration: none;
+  h1 { margin: 0; font-size: 2.5rem; }
+  .services {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+  .card {
+    background: #161b22;
     border-radius: 8px;
-    transition: 0.3s;
+    padding: 1rem;
+    width: 260px;
+    text-align: center;
   }
-  .links a:hover {
-    background: #005ea3;
-  }
-  footer { margin-top: 50px; font-size: 0.9em; color: #777; }
+  .card h2 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+  canvas { width: 100%; height: 50px; background: #0d1117; border-radius: 4px; display: block; margin: 0 auto 0.5rem auto; }
+  #last-checked { text-align: center; padding: 1rem; font-size: 0.9rem; color: #8b949e; }
+  a { color: #58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
 </style>
 </head>
 <body>
-<h1>Welcome to Squibbl!</h1>
-<p>Your home media hub. Click below to access your services:</p>
 
-<div class="links">
-  <a href="https://jellyfin.squibbl.com" target="_blank">Jellyfin</a>
-  <a href="https://plex.squibbl.com" target="_blank">Plex</a>
-  <a href="https://jellyseerr.squibbl.com" target="_blank">Jellyseerr</a>
-  <a href="https://wizarr.squibbl.com" target="_blank">Wizarr</a>
+<header>
+  <h1>Squibbl Services Dashboard</h1>
+  <p>Quick status overview of all services</p>
+</header>
+
+<div class="services">
+  <div class="card">
+    <h2>Jellyfin</h2>
+    <canvas id="jellyfin-graph"></canvas>
+    <a href="https://jellyfin.squibbl.com" target="_blank">Open</a>
+  </div>
+  <div class="card">
+    <h2>Plex</h2>
+    <canvas id="plex-graph"></canvas>
+    <a href="https://plex.squibbl.com" target="_blank">Open</a>
+  </div>
+  <div class="card">
+    <h2>Wizarr</h2>
+    <canvas id="wizarr-graph"></canvas>
+    <a href="https://wizarr.squibbl.com" target="_blank">Open</a>
+  </div>
+  <div class="card">
+    <h2>Jellyseerr</h2>
+    <canvas id="jellyseerr-graph"></canvas>
+    <a href="https://jellyseerr.squibbl.com" target="_blank">Open</a>
+  </div>
 </div>
 
-<footer>
-  Note: Services hosted at home may be offline if the server is down.
-</footer>
+<div id="last-checked">Last checked: --:--:--</div>
+
+<script>
+const services = [
+  { id:'jellyfin', url:'https://jellyfin.squibbl.com', history:[], timestamps:[] },
+  { id:'plex', url:'https://plex.squibbl.com', history:[], timestamps:[] },
+  { id:'wizarr', url:'https://wizarr.squibbl.com', history:[], timestamps:[] },
+  { id:'jellyseerr', url:'https://jellyseerr.squibbl.com', history:[], timestamps:[] }
+];
+
+const maxPoints = 20;
+
+const tooltip = document.createElement('div');
+tooltip.style.position='absolute';
+tooltip.style.background='rgba(0,0,0,0.8)';
+tooltip.style.color='white';
+tooltip.style.padding='4px 8px';
+tooltip.style.borderRadius='4px';
+tooltip.style.fontSize='12px';
+tooltip.style.pointerEvents='none';
+tooltip.style.display='none';
+document.body.appendChild(tooltip);
+
+function attachTooltip(service) {
+  const canvas = document.getElementById(`${service.id}-graph`);
+  canvas.addEventListener('mousemove', (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const i = Math.floor((e.clientX - rect.left)/(canvas.width/(service.history.length-1)));
+    if(service.timestamps[i]){
+      const time = service.timestamps[i].toLocaleTimeString();
+      const status = service.history[i] ? 'Online' : 'Offline';
+      tooltip.textContent = `${status} @ ${time}`;
+      tooltip.style.left = (e.pageX + 10) + 'px';
+      tooltip.style.top = (e.pageY + 10) + 'px';
+      tooltip.style.display = 'block';
+    }
+  });
+  canvas.addEventListener('mouseleave', ()=>{ tooltip.style.display='none'; });
+}
+
+async function checkStatus(service) {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(()=>controller.abort(), 3000);
+    await fetch(service.url, { mode:'no-cors', signal: controller.signal });
+    service.history.push(1);
+  } catch {
+    service.history.push(0);
+  }
+  service.timestamps.push(new Date());
+  if(service.history.length > maxPoints){ service.history.shift(); service.timestamps.shift(); }
+}
+
+function drawGraph(service) {
+  const canvas = document.getElementById(`${service.id}-graph`);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(service.history.length < 2) return;
+
+  const points = service.history.map((v,i)=>{
+    const x = i*(canvas.width/(service.history.length-1));
+    const y = canvas.height - v*canvas.height;
+    return {x,y};
+  });
+
+  ctx.beginPath();
+  points.forEach((p,i)=>i===0?ctx.moveTo(p.x,canvas.height):ctx.lineTo(p.x,p.y));
+  ctx.lineTo(canvas.width,canvas.height);
+  ctx.closePath();
+  ctx.fillStyle='rgba(97,218,251,0.3)';
+  ctx.fill();
+
+  ctx.beginPath();
+  points.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+  ctx.strokeStyle='#61dafb';
+  ctx.lineWidth=2;
+  ctx.stroke();
+
+  service.history.forEach((v,i)=>{
+    if(v===0){
+      const x = i*(canvas.width/(service.history.length-1));
+      const w = canvas.width/(service.history.length-1);
+      ctx.fillStyle='rgba(255,0,0,0.3)';
+      ctx.fillRect(x,0,w,canvas.height);
+    }
+  });
+}
+
+async function updateStatuses() {
+  for(const s of services){ await checkStatus(s); drawGraph(s); attachTooltip(s); }
+  document.getElementById('last-checked').textContent=`Last checked: ${new Date().toLocaleTimeString()}`;
+}
+
+function animate() {
+  services.forEach(drawGraph);
+  requestAnimationFrame(animate);
+}
+
+updateStatuses();
+setInterval(updateStatuses,15000);
+animate();
+</script>
+
 </body>
 </html>
