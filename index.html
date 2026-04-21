@@ -1,160 +1,748 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Squibbl Dashboard</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>SQUIBBL · 91.7 FM · Broadcasting from the living room, continuously</title>
+<meta name="description" content="Squibbl — a small, continuous broadcast of movies, music, memories, and moving pictures." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
-    margin: 0;
-    padding: 0;
-    transition: background-color 0.3s, color 0.3s;
-  }
-  body.dark {
-    background-color: #121212;
-    color: #e0e0e0;
-  }
-  header {
-    padding: 1rem;
-    text-align: center;
-  }
-  .toggle-btn {
-    cursor: pointer;
-    padding: 0.5rem 1rem;
-    margin-left: 1rem;
-    border: none;
-    background-color: #007bff;
-    color: #fff;
-    border-radius: 5px;
-  }
-  .services {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1rem;
-  }
-  .service-card {
-    width: 200px;
-    padding: 1rem;
-    border-radius: 10px;
-    background-color: #fff;
-    text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-    cursor: pointer;
-  }
-  .service-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  }
-  body.dark .service-card {
-    background-color: #1f1f1f;
-  }
-  .service-logo {
-    width: 64px;
-    height: 64px;
-    object-fit: contain;
-    margin-bottom: 0.5rem;
-  }
-  .service-name {
-    font-weight: bold;
-    margin-bottom: 0.5rem;
-  }
-  .uptime-indicator {
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    margin: 0 auto 0.5rem auto;
-    background-color: #ccc;
-  }
-  .service-graph {
-    height: 10px;
-    width: 100%;
-    border-radius: 5px;
-    background-color: #ccc;
-  }
+:root{
+  --ink:#0b0d14;
+  --ink-2:#141826;
+  --ink-3:#1d2236;
+  --cream:#f2ecdc;
+  --cream-2:#e6dcc0;
+  --tang:#ff5a1f;
+  --tang-deep:#d13f0a;
+  --teal:#2ed0be;
+  --lilac:#b19cd9;
+  --rule:#f2ecdc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--ink);color:var(--cream);overflow-x:hidden}
+body{
+  font-family:"JetBrains Mono",ui-monospace,monospace;
+  font-size:14px;
+  line-height:1.55;
+  min-height:100vh;
+  background:
+    radial-gradient(1200px 700px at 85% -10%, rgba(255,90,31,.18), transparent 60%),
+    radial-gradient(900px 600px at 10% 110%, rgba(46,208,190,.14), transparent 60%),
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(255,255,255,.014) 2px 3px),
+    var(--ink);
+  position:relative;
+}
+/* CRT scanlines — subtle */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:70;
+  background:repeating-linear-gradient(0deg,rgba(11,13,20,.28) 0 2px,transparent 2px 4px);
+  mix-blend-mode:multiply;opacity:.6;
+}
+/* grain */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:71;mix-blend-mode:overlay;opacity:.08;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+.frame{max-width:1320px;margin:0 auto;padding:28px 40px 80px;position:relative;z-index:1}
+
+/* --- top strip --- */
+.strip{
+  display:grid;
+  grid-template-columns: auto 1fr auto;
+  align-items:center;
+  gap:24px;
+  padding:10px 16px;
+  border:1.5px solid var(--cream);
+  border-radius:999px;
+  background:rgba(242,236,220,.04);
+  backdrop-filter: blur(6px);
+}
+.strip .onair{
+  display:flex;align-items:center;gap:10px;
+  font-family:"Archivo Black",sans-serif;
+  font-size:12px;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--tang);
+}
+.onair .dot{
+  width:10px;height:10px;border-radius:50%;
+  background:var(--tang);
+  box-shadow:0 0 0 0 rgba(255,90,31,.7);
+  animation:blip 1.3s infinite;
+}
+@keyframes blip{
+  0%{box-shadow:0 0 0 0 rgba(255,90,31,.7)}
+  70%{box-shadow:0 0 0 14px rgba(255,90,31,0)}
+  100%{box-shadow:0 0 0 0 rgba(255,90,31,0)}
+}
+.strip .ticker{
+  overflow:hidden;height:22px;position:relative;
+}
+.strip .ticker .track{
+  display:flex;gap:40px;white-space:nowrap;
+  animation:ticker 50s linear infinite;
+  font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--cream);
+  position:absolute;top:3px;left:0;
+}
+.strip .ticker em{color:var(--tang);font-style:normal}
+.strip .ticker i{color:var(--teal);font-style:normal;margin:0 6px}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.strip .clock{
+  font-family:"JetBrains Mono",monospace;
+  font-size:12px;letter-spacing:.15em;color:var(--cream);
+  display:flex;gap:14px;align-items:center;
+}
+.strip .clock b{color:var(--teal);font-weight:600}
+
+/* --- hero --- */
+.hero{
+  margin-top:40px;
+  display:grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap:40px;
+  align-items:end;
+  position:relative;
+}
+.hero .lockup{position:relative}
+.hero .kicker{
+  font-family:"Archivo Black",sans-serif;
+  font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--teal);margin-bottom:22px;
+  display:flex;align-items:center;gap:12px;
+}
+.hero .kicker::before{content:"";width:36px;height:2px;background:var(--teal)}
+.hero h1{
+  font-family:"Instrument Serif",serif;
+  font-weight:400;
+  font-size:clamp(110px,16vw,260px);
+  line-height:.78;
+  letter-spacing:-.04em;
+  color:var(--cream);
+}
+.hero h1 .squ{display:block}
+.hero h1 .ibb{display:block; font-style:italic; color:var(--tang); margin-left:.35em; position:relative}
+.hero h1 .ibb::after{
+  content:"91.7";
+  position:absolute; right:-0.02em; top:.05em;
+  transform:translateX(100%);
+  font-family:"Archivo Black",sans-serif;
+  font-style:normal; font-size:.12em;
+  letter-spacing:.15em; color:var(--cream);
+  background:var(--ink-3);
+  padding:6px 10px 5px; margin-left:18px;
+  border:1.5px solid var(--cream);
+  white-space:nowrap;
+}
+.hero .tagline{
+  margin-top:28px;
+  font-family:"Instrument Serif",serif;
+  font-style:italic;
+  font-size:clamp(22px,2.2vw,32px);
+  line-height:1.3;
+  color:var(--cream-2);
+  max-width:30ch;
+}
+.hero .tagline em{color:var(--tang);font-style:italic}
+
+/* vinyl + cover */
+.console{
+  position:relative;
+  aspect-ratio:1/1;
+  max-width:480px; justify-self:end; width:100%;
+}
+.vinyl{
+  position:absolute;
+  top:0; right:8%;
+  width:78%; aspect-ratio:1/1;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--tang) 0 7%, transparent 7.5%),
+    radial-gradient(circle at 50% 50%, var(--ink-2) 7.5% 17%, transparent 17.5%),
+    repeating-radial-gradient(circle at 50% 50%, #15192a 0 1px, #0e1220 1px 2px, #181d33 2px 3px),
+    var(--ink);
+  box-shadow:
+    0 30px 60px -20px rgba(0,0,0,.7),
+    0 0 0 2px rgba(242,236,220,.12);
+  animation:spin 8s linear infinite;
+}
+.vinyl::after{
+  content:"";
+  position:absolute; inset:0;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255,255,255,.09), transparent 42%);
+  pointer-events:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cover{
+  position:absolute;
+  left:0; bottom:0;
+  width:62%; aspect-ratio:1/1;
+  background:
+    linear-gradient(135deg, var(--tang) 0 50%, var(--cream) 50% 100%);
+  border:2px solid var(--cream);
+  padding:18px;
+  display:flex; flex-direction:column; justify-content:space-between;
+  color:var(--ink);
+  transform:rotate(-4deg);
+  box-shadow:0 24px 40px -18px rgba(0,0,0,.7);
+}
+.cover .tag{
+  font-family:"Archivo Black",sans-serif;
+  font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--ink);
+}
+.cover .title{
+  font-family:"Instrument Serif",serif;
+  font-style:italic;
+  font-size:clamp(22px,3.2vw,34px);
+  line-height:.95;
+  color:var(--ink);
+}
+.cover .title b{color:var(--cream);display:block;font-family:"Archivo Black",sans-serif;font-style:normal;font-size:.38em;letter-spacing:.22em;text-transform:uppercase;margin-top:10px}
+.cover .foot{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  font-family:"JetBrains Mono",monospace;
+  font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+}
+.stylus{
+  position:absolute;
+  top:2%; right:-4%;
+  width:52%; height:6px;
+  background:linear-gradient(90deg, var(--cream) 0 8%, var(--ink-2) 8% 100%);
+  transform-origin:right center;
+  transform:rotate(-18deg);
+  border-radius:999px;
+  box-shadow:0 6px 14px rgba(0,0,0,.5);
+}
+.stylus::before{
+  content:"";position:absolute;left:0;top:-6px;width:18px;height:18px;background:var(--tang);border-radius:50%;
+  box-shadow:0 0 0 3px var(--cream);
+}
+.stylus::after{
+  content:"";position:absolute;right:-10px;top:-6px;width:18px;height:18px;background:var(--ink-3);border-radius:50%;border:2px solid var(--cream);
+}
+
+/* --- dial section --- */
+.dial-wrap{
+  margin-top:80px;
+  padding:28px;
+  border:1.5px solid var(--cream);
+  background:linear-gradient(180deg, var(--ink-2), var(--ink));
+  position:relative;
+}
+.dial-wrap::before{
+  content:"SIGNAL MONITOR — UPDATED LIVE";
+  position:absolute;top:-11px;left:24px;background:var(--ink);
+  padding:0 10px;
+  font-family:"Archivo Black",sans-serif;
+  font-size:10px;letter-spacing:.32em;color:var(--teal);
+}
+.dial-wrap::after{
+  content:"EST. 2024";
+  position:absolute;top:-11px;right:24px;background:var(--ink);padding:0 10px;
+  font-family:"JetBrains Mono",monospace;font-size:10px;letter-spacing:.32em;color:var(--cream-2);
+}
+.dial{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:18px;
+}
+
+/* dial card */
+.svc{
+  display:grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items:center;
+  gap:28px;
+  padding:22px 26px;
+  border:1.5px solid var(--cream);
+  background:var(--ink-3);
+  text-decoration:none;
+  color:var(--cream);
+  position:relative;
+  overflow:hidden;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1), background .3s, border-color .3s;
+}
+.svc::before{
+  content:"";
+  position:absolute; inset:0;
+  background:linear-gradient(90deg, transparent 0%, rgba(255,90,31,.14) 50%, transparent 100%);
+  transform:translateX(-100%);
+  transition:transform .7s cubic-bezier(.2,.8,.2,1);
+  pointer-events:none;
+}
+.svc:hover{transform:translateY(-3px);background:#1a2038;border-color:var(--tang)}
+.svc:hover::before{transform:translateX(100%)}
+.svc .n{
+  font-family:"Archivo Black",sans-serif;
+  font-size:34px; letter-spacing:.02em;
+  color:var(--tang);
+  min-width:80px;
+}
+.svc .body{
+  display:flex;flex-direction:column;gap:4px;min-width:0;
+}
+.svc .name{
+  font-family:"Instrument Serif",serif;
+  font-size:42px; line-height:.95;
+  font-style:italic;
+  color:var(--cream);
+}
+.svc .desc{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--cream-2);
+}
+.svc .freq{
+  font-family:"JetBrains Mono",monospace;
+  font-size:11px;letter-spacing:.2em;color:var(--teal);
+  text-align:right;
+}
+.svc .freq b{display:block;font-family:"Archivo Black",sans-serif;font-size:22px;letter-spacing:.04em;color:var(--cream);margin-top:4px}
+.svc .uptime{
+  display:block;
+  margin-top:8px;
+  font-family:"JetBrains Mono",monospace;
+  font-size:10px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--cream-2);
+}
+.svc.up .uptime{color:var(--teal)}
+.svc.down .uptime{color:var(--tang)}
+.svc .go{
+  font-family:"Archivo Black",sans-serif;
+  font-size:10px;letter-spacing:.3em;color:var(--ink);
+  background:var(--cream);padding:10px 14px;
+  transition:background .2s, color .2s;
+}
+.svc:hover .go{background:var(--tang);color:var(--ink)}
+
+/* VU meter */
+.vu{
+  display:flex;gap:3px;align-items:flex-end;height:28px;
+}
+.vu span{
+  display:block;width:5px;background:var(--ink-2);border:1px solid rgba(242,236,220,.2);
+  height:20%;
+  transition:height .4s ease, background .4s;
+}
+.svc.up .vu span{background:var(--teal)}
+.svc.up .vu span:nth-child(1){animation:vu 1.1s infinite .00s}
+.svc.up .vu span:nth-child(2){animation:vu 1.3s infinite .10s}
+.svc.up .vu span:nth-child(3){animation:vu 1.0s infinite .20s}
+.svc.up .vu span:nth-child(4){animation:vu 1.5s infinite .05s}
+.svc.up .vu span:nth-child(5){animation:vu 1.2s infinite .15s}
+.svc.up .vu span:nth-child(6){animation:vu 1.4s infinite .25s}
+.svc.up .vu span:nth-child(7){animation:vu 1.1s infinite .00s}
+.svc.up .vu span:nth-child(8){animation:vu 1.6s infinite .30s}
+.svc.up .vu span:nth-child(n+7){background:var(--tang)}
+.svc.down .vu span{background:#2a2030}
+.svc.down .freq b{color:var(--tang)}
+.svc.unknown .vu span{background:rgba(177,156,217,.25)}
+@keyframes vu{
+  0%,100%{height:20%}
+  25%{height:80%}
+  50%{height:45%}
+  75%{height:95%}
+}
+
+/* status tag */
+.status{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:"Archivo Black",sans-serif;
+  font-size:10px;letter-spacing:.28em;text-transform:uppercase;
+  padding:6px 10px;border:1.5px solid var(--cream);color:var(--cream);
+  background:var(--ink);
+}
+.svc.up .status{color:var(--teal);border-color:var(--teal)}
+.svc.down .status{color:var(--tang);border-color:var(--tang)}
+.svc.unknown .status{color:var(--lilac);border-color:var(--lilac)}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+
+/* --- frequency bar --- */
+.freqbar{
+  margin-top:28px;
+  padding:20px 26px;
+  border:1.5px solid var(--cream);
+  position:relative;
+  background:var(--ink);
+}
+.freqbar .scale{
+  display:flex; justify-content:space-between;
+  font-family:"JetBrains Mono",monospace;
+  font-size:10px;letter-spacing:.22em;color:var(--cream-2);
+  margin-bottom:10px;
+}
+.freqbar .line{
+  position:relative;
+  height:54px;
+  background:repeating-linear-gradient(90deg, var(--cream) 0 1px, transparent 1px 20px);
+  border-top:1px solid var(--cream); border-bottom:1px solid var(--cream);
+}
+.freqbar .line::before{
+  content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg, var(--cream) 0 1px, transparent 1px 40px);
+  opacity:.6;
+  transform:translateY(-30%);
+}
+.freqbar .needle{
+  position:absolute;top:-8px;bottom:-8px;width:2px;
+  background:var(--tang);
+  box-shadow:0 0 14px rgba(255,90,31,.9);
+  left:40%;
+  animation:tune 9s ease-in-out infinite alternate;
+}
+.freqbar .needle::before{
+  content:"";position:absolute;left:-6px;top:-4px;width:14px;height:14px;background:var(--tang);border-radius:50%;
+}
+.freqbar .needle::after{
+  content:"91.7";
+  position:absolute;top:-24px;left:50%;transform:translateX(-50%);
+  font-family:"Archivo Black",sans-serif;font-size:10px;letter-spacing:.15em;color:var(--tang);
+  white-space:nowrap;
+}
+@keyframes tune{
+  0%{left:20%} 30%{left:68%} 60%{left:32%} 100%{left:40%}
+}
+
+/* --- schedule & about --- */
+.cols{
+  margin-top:80px;
+  display:grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap:40px;
+}
+.cols h2{
+  font-family:"Archivo Black",sans-serif;
+  font-size:12px;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--teal);
+  margin-bottom:18px;
+  padding-bottom:10px;
+  border-bottom:1.5px solid var(--cream);
+}
+.sched .slot{
+  display:grid;
+  grid-template-columns: 90px 1fr auto;
+  gap:18px;align-items:baseline;
+  padding:14px 0;
+  border-bottom:1px dashed rgba(242,236,220,.25);
+}
+.sched .t{
+  font-family:"JetBrains Mono",monospace;
+  font-size:12px;letter-spacing:.15em;color:var(--cream-2);
+}
+.sched .show{
+  font-family:"Instrument Serif",serif;
+  font-style:italic;
+  font-size:26px;line-height:1.05;color:var(--cream);
+}
+.sched .show small{
+  display:block;
+  font-family:"JetBrains Mono",monospace;
+  font-style:normal;
+  font-size:10.5px;letter-spacing:.2em;color:var(--cream-2);
+  text-transform:uppercase;
+  margin-top:4px;
+}
+.sched .now{
+  font-family:"Archivo Black",sans-serif;
+  font-size:10px;letter-spacing:.3em;color:var(--ink);background:var(--tang);
+  padding:6px 10px;align-self:center;
+}
+.sched .slot.is-now{background:linear-gradient(90deg, rgba(255,90,31,.08), transparent 80%);padding-left:12px;margin-left:-12px}
+
+.manifesto p{
+  font-family:"Instrument Serif",serif;
+  font-style:italic;
+  font-size:22px;
+  line-height:1.35;
+  color:var(--cream);
+  margin-bottom:18px;
+}
+.manifesto p:first-of-type::first-letter{
+  font-family:"Instrument Serif",serif;font-style:normal;
+  font-size:4.2em;float:left;line-height:.85;padding:6px 12px 0 0;color:var(--tang);
+}
+.manifesto .sig{
+  margin-top:28px;
+  display:flex;align-items:center;gap:16px;
+  font-family:"JetBrains Mono",monospace;
+  font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--cream-2);
+}
+.manifesto .sig::before{content:"";width:36px;height:2px;background:var(--tang)}
+
+/* --- footer --- */
+.foot{
+  margin-top:80px;
+  padding-top:24px;
+  border-top:1.5px solid var(--cream);
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap:24px;align-items:start;
+}
+.foot .block strong{
+  display:block;
+  font-family:"Archivo Black",sans-serif;
+  font-size:10px;letter-spacing:.3em;color:var(--teal);
+  margin-bottom:10px;
+}
+.foot .block{font-size:12px;color:var(--cream-2);line-height:1.8}
+.foot .bigmark{
+  grid-column: span 4;
+  margin-top:20px;
+  font-family:"Instrument Serif",serif;
+  font-style:italic;
+  font-size:clamp(40px,8vw,120px);
+  line-height:.9;
+  color:var(--ink-3);
+  -webkit-text-stroke:1px var(--cream);
+  letter-spacing:-.02em;
+  text-align:center;
+}
+.foot .bigmark em{color:var(--tang);font-style:italic;-webkit-text-stroke:1px var(--tang)}
+.foot .fineprint{
+  grid-column: span 4;
+  display:flex;justify-content:space-between;
+  font-family:"JetBrains Mono",monospace;
+  font-size:10px;letter-spacing:.22em;color:var(--cream-2);
+  margin-top:18px;
+  text-transform:uppercase;
+}
+
+/* reveals */
+.r{opacity:0;transform:translateY(14px);animation:r .9s cubic-bezier(.2,.7,.2,1) forwards}
+.r1{animation-delay:.1s}.r2{animation-delay:.28s}.r3{animation-delay:.46s}
+.r4{animation-delay:.64s}.r5{animation-delay:.82s}.r6{animation-delay:1.0s}
+@keyframes r{to{opacity:1;transform:none}}
+
+/* small */
+@media (max-width:980px){
+  .hero,.cols,.foot{grid-template-columns:1fr}
+  .hero h1 .ibb::after{position:static;display:inline-block;transform:none;margin:6px 0 0}
+  .console{justify-self:center;max-width:380px}
+  .svc{grid-template-columns:auto 1fr;gap:14px}
+  .svc .freq,.svc .go{grid-column:span 2;text-align:left}
+  .vu{display:none}
+  .frame{padding:20px 18px 60px}
+  .foot .fineprint{flex-direction:column;gap:4px}
+}
 </style>
 </head>
 <body>
-<header>
-  <h1>Squibbl Dashboard</h1>
-  <button class="toggle-btn" onclick="document.body.classList.toggle('dark')">Toggle Dark/Light</button>
-</header>
+<div class="frame">
 
-<div class="services">
-  <div class="service-card" onclick="window.open('https://jellyfin.squibbl.com','_blank')">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Jellyfin_-_icon-transparent.svg" class="service-logo" alt="Jellyfin Logo">
-    <div class="service-name">Jellyfin</div>
-    <div id="uptime-jellyfin" class="uptime-indicator"></div>
-    <div id="graph-jellyfin" class="service-graph"></div>
+  <!-- TOP STRIP -->
+  <header class="strip r r1">
+    <div class="onair"><span class="dot"></span>On Air</div>
+    <div class="ticker">
+      <div class="track" id="track">
+        <span>Broadcasting continuously from the living room <i>·</i> <em>91.7 FM</em> <i>·</i> Squibbl Community Radio <i>·</i> No commercials, ever <i>·</i> <em>Now spinning</em>: whatever you pressed play on <i>·</i> Requests taken via Jellyseerr <i>·</i> Signal strong across the living room and most of the kitchen <i>·</i></span>
+        <span>Broadcasting continuously from the living room <i>·</i> <em>91.7 FM</em> <i>·</i> Squibbl Community Radio <i>·</i> No commercials, ever <i>·</i> <em>Now spinning</em>: whatever you pressed play on <i>·</i> Requests taken via Jellyseerr <i>·</i> Signal strong across the living room and most of the kitchen <i>·</i></span>
+      </div>
+    </div>
+    <div class="clock">
+      <span id="clock">--:--:--</span>
+      <b id="tz">ET</b>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="lockup r r2">
+      <div class="kicker">A small continuous broadcast</div>
+      <h1>
+        <span class="squ">SQUIBBL</span>
+        <span class="ibb">radio</span>
+      </h1>
+      <p class="tagline">
+        Four studios, <em>one antenna</em>, and an unreasonable amount of storage. Tune in, take what you like, leave a request on the way out.
+      </p>
+    </div>
+
+    <div class="console r r3" aria-hidden="true">
+      <div class="vinyl"></div>
+      <div class="stylus"></div>
+      <div class="cover">
+        <div class="tag">Side A · 12"</div>
+        <div class="title">
+          Broadcasting,<br/>quietly.
+          <b>Squibbl Sessions Vol. IV</b>
+        </div>
+        <div class="foot">
+          <span>33⅓ rpm</span>
+          <span>Nº 047</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FREQUENCY BAR -->
+  <div class="freqbar r r4" aria-hidden="true">
+    <div class="scale">
+      <span>88.0</span><span>89.5</span><span>91.0</span><span>91.7 ▼</span><span>93.0</span><span>95.5</span><span>98.0</span>
+    </div>
+    <div class="line"><div class="needle"></div></div>
   </div>
 
-  <div class="service-card" onclick="window.open('https://plex.squibbl.com','_blank')">
-    <img src="https://wiki.mrmc.tv/images/c/cf/Plex_icon.png" class="service-logo" alt="Plex Logo">
-    <div class="service-name">Plex</div>
-    <div id="uptime-plex" class="uptime-indicator"></div>
-    <div id="graph-plex" class="service-graph"></div>
-  </div>
+  <!-- DIAL (services) -->
+  <section class="dial-wrap r r4">
+    <div class="dial" id="dial">
+      <!-- Services injected by JS -->
+    </div>
+  </section>
 
-  <div class="service-card" onclick="window.open('https://jellyseerr.squibbl.com','_blank')">
-    <img src="https://cdn.jsdelivr.net/gh/selfhst/icons/webp/jellyseerr.webp" class="service-logo" alt="Jellyseerr Logo">
-    <div class="service-name">Jellyseerr</div>
-    <div id="uptime-jellyseerr" class="uptime-indicator"></div>
-    <div id="graph-jellyseerr" class="service-graph"></div>
-  </div>
+  <!-- SCHEDULE + MANIFESTO -->
+  <section class="cols">
+    <div class="sched r r5">
+      <h2>— Today's Rotation —</h2>
+      <div class="slot"><span class="t">06:00</span><span class="show">The Long Documentary <small>feature films, quietly</small></span></div>
+      <div class="slot"><span class="t">09:00</span><span class="show">Weekday Cartoons <small>light picks, low stakes</small></span></div>
+      <div class="slot"><span class="t">13:00</span><span class="show">Afternoon Request Hour <small>whatever you asked for</small></span></div>
+      <div class="slot is-now"><span class="t">— NOW —</span><span class="show">Living Room FM <small>ambient rotation · low volume</small></span><span class="now">Live</span></div>
+      <div class="slot"><span class="t">20:00</span><span class="show">The Prestige Slot <small>one film, no interruptions</small></span></div>
+      <div class="slot"><span class="t">23:30</span><span class="show">Night Tape <small>something to fall asleep to</small></span></div>
+    </div>
 
-  <div class="service-card" onclick="window.open('https://wizarr.squibbl.com','_blank')">
-    <img src="https://github.com/wizarrrr/wizarr/blob/main/app/static/wizarr-logo.png?raw=true" class="service-logo" alt="Wizarr Logo">
-    <div class="service-name">Wizarr</div>
-    <div id="uptime-wizarr" class="uptime-indicator"></div>
-    <div id="graph-wizarr" class="service-graph"></div>
-  </div>
+    <div class="manifesto r r6">
+      <h2>— From the Station —</h2>
+      <p>
+        Squibbl is a small, continuous broadcast. It runs because somebody plugged it in, and it keeps running because nobody has unplugged it. There is no commercial break.
+      </p>
+      <p>
+        We catalogue what we love and lend it out freely. The antenna is in the attic. The studio is in the living room. The <em>signal</em> is the point.
+      </p>
+      <div class="sig">Station manager — jq · est. MMXXIV</div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="foot">
+    <div class="block"><strong>Band</strong>VHF · Domestic<br/>Range: living room<br/>Signal: reliable-ish</div>
+    <div class="block"><strong>License</strong>Pirate, affectionate<br/>No royalties collected<br/>No listeners tracked</div>
+    <div class="block"><strong>Studios</strong>Jellyfin Wing<br/>Plex Studio<br/>Jellyseerr Lobby<br/>Wizarr Welcome Desk</div>
+    <div class="block"><strong>Contact</strong>Slide a note under<br/>the living-room door.<br/>We'll pick up eventually.</div>
+    <div class="bigmark">SQUIBBL <em>·</em> always on.</div>
+    <div class="fineprint">
+      <span>© MMXXVI Squibbl Broadcast Co.</span>
+      <span>Broadcasting from 192.168.0.101</span>
+      <span>91.7 FM — Living Room</span>
+    </div>
+  </footer>
 </div>
 
 <script>
+const KUMA = 'https://status.squibbl.com';
+const SLUG = 'squibbl';
 const services = [
-  {name:'jellyfin', url:'https://jellyfin.squibbl.com'},
-  {name:'plex', url:'https://plex.squibbl.com'},
-  {name:'jellyseerr', url:'https://jellyseerr.squibbl.com'},
-  {name:'wizarr', url:'https://wizarr.squibbl.com'}
+  {id:'jellyfin',   kumaId:2, name:'Jellyfin',   freq:'88.3', desc:'Open-source cinema · libraries & live streams', url:'https://jellyfin.squibbl.com'},
+  {id:'plex',       kumaId:4, name:'Plex',       freq:'91.7', desc:'The Prestige Slot · flagship studio',            url:'https://plex.squibbl.com'},
+  {id:'jellyseerr', kumaId:3, name:'Jellyseerr', freq:'94.1', desc:'Requests & letters to the station',              url:'https://jellyseerr.squibbl.com'},
+  {id:'wizarr',     kumaId:5, name:'Wizarr',     freq:'97.5', desc:'Welcome desk · new listener invites',            url:'https://wizarr.squibbl.com'},
 ];
+const N = (i)=> String(i+1).padStart(2,'0');
+const dial = document.getElementById('dial');
+services.forEach((s,i)=>{
+  const a = document.createElement('a');
+  a.className='svc unknown r r'+(Math.min(5,i+2));
+  a.href=s.url; a.target='_blank'; a.rel='noopener';
+  a.dataset.id=s.id;
+  a.innerHTML=`
+    <div class="n">${N(i)}</div>
+    <div class="body">
+      <div class="name">${s.name}</div>
+      <div class="desc">${s.desc}</div>
+    </div>
+    <div class="vu" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span>
+    </div>
+    <div class="freq">
+      Tuned to
+      <b>${s.freq}</b>
+      <span class="status" data-status>checking</span>
+      <span class="uptime" data-uptime>— · — ms</span>
+    </div>
+    <div class="go">Tune In ↗</div>
+  `;
+  dial.appendChild(a);
+});
 
-const uptimeData = {};
-services.forEach(s => uptimeData[s.name] = []);
-
-async function checkService(service) {
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-    await fetch(service.url, { method: 'HEAD', mode: 'no-cors', signal: controller.signal });
-    clearTimeout(timeout);
-    return true;
-  } catch {
-    return false;
+// Kuma status: 0=down, 1=up, 2=pending, 3=maintenance
+const STATUS_MAP = {
+  0: {cls:'down',    label:'off air'},
+  1: {cls:'up',      label:'on air'},
+  2: {cls:'unknown', label:'warming up'},
+  3: {cls:'unknown', label:'maintenance'},
+};
+async function refresh(){
+  let data;
+  try{
+    const r = await fetch(`${KUMA}/api/status-page/heartbeat/${SLUG}`, {cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    data = await r.json();
+  }catch(e){
+    services.forEach(s=>{
+      const el = document.querySelector(`.svc[data-id="${s.id}"]`);
+      if(!el) return;
+      el.classList.remove('up','down'); el.classList.add('unknown');
+      el.querySelector('[data-status]').textContent='signal lost';
+      el.querySelector('[data-uptime]').textContent='— · — ms';
+    });
+    return;
   }
+  const { heartbeatList={}, uptimeList={} } = data;
+  services.forEach(s=>{
+    const el = document.querySelector(`.svc[data-id="${s.id}"]`);
+    if(!el) return;
+    const beats = heartbeatList[s.kumaId] || [];
+    const last  = beats[beats.length-1];
+    const uptime24 = uptimeList[`${s.kumaId}_24`];
+    const m = STATUS_MAP[last?.status] || STATUS_MAP[2];
+    el.classList.remove('up','down','unknown');
+    el.classList.add(m.cls);
+    el.querySelector('[data-status]').textContent = m.label;
+    const up = uptime24!=null ? (uptime24*100).toFixed(2)+'%' : '—';
+    const ping = last?.ping!=null ? last.ping+' ms' : '— ms';
+    el.querySelector('[data-uptime]').textContent = `${up} · ${ping}`;
+  });
 }
+refresh();
+setInterval(refresh, 30000);
 
-async function updateStatus() {
-  for (let service of services) {
-    const status = await checkService(service);
-    const uptimeArr = uptimeData[service.name];
-    uptimeArr.push(status);
-    if (uptimeArr.length > 20) uptimeArr.shift();
+// clock
+function tick(){
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2,'0');
+  const m = String(d.getMinutes()).padStart(2,'0');
+  const s = String(d.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent = `${h}:${m}:${s}`;
+  const tz = Intl.DateTimeFormat(undefined,{timeZoneName:'short'}).formatToParts(d).find(p=>p.type==='timeZoneName')?.value || 'ET';
+  document.getElementById('tz').textContent = tz;
+}
+tick(); setInterval(tick, 1000);
 
-    const indicator = document.getElementById(`uptime-${service.name}`);
-    indicator.style.backgroundColor = status ? '#00cc66' : '#cc0000';
-
-    const graph = document.getElementById(`graph-${service.name}`);
-    const gradient = uptimeArr.map(up => up ? '#00cc66' : '#cc0000').join(',');
-    graph.style.background = `linear-gradient(90deg, ${gradient})`;
+// highlight current schedule slot by hour
+(function(){
+  const slots=[...document.querySelectorAll('.sched .slot')];
+  const hours=[6,9,13,-1,20,23.5];
+  const h = new Date().getHours() + new Date().getMinutes()/60;
+  let active = 3; // default NOW
+  for(let i=hours.length-1;i>=0;i--){
+    if(hours[i]>0 && h>=hours[i]){ active=i; break; }
   }
-}
-
-updateStatus();
-setInterval(updateStatus, 30000);
+  slots.forEach((el,i)=>el.classList.toggle('is-now', i===active));
+  const now = slots[active]?.querySelector('.now');
+  slots.forEach(el=>{ const n=el.querySelector('.now'); if(n) n.remove(); });
+  if(slots[active]){
+    const live=document.createElement('span');
+    live.className='now'; live.textContent='Live';
+    slots[active].appendChild(live);
+    slots[active].querySelector('.t').textContent='— NOW —';
+  }
+})();
 </script>
 </body>
 </html>
