@@ -349,6 +349,25 @@ body::after{
   75%{height:95%}
 }
 
+/* history dots — last 24 heartbeats, aligned to the 61px VU strip
+   VU: 8 × 5px bars + 7 × 3px gaps = 61px */
+.dots{
+  display:flex;justify-content:space-between;align-items:center;
+  width:61px;height:6px;
+  margin-top:8px;
+}
+.dots b{
+  display:block;width:2px;height:2px;border-radius:50%;
+  background:var(--ink-2);
+  transition:background .4s ease, transform .4s ease, box-shadow .4s ease;
+}
+.dots b[data-s="1"]{background:var(--teal)}
+.dots b[data-s="0"]{background:var(--tang);width:3px;height:3px}
+.dots b[data-s="2"]{background:var(--lilac);opacity:.6}
+.dots b[data-s="3"]{background:var(--cream-2);opacity:.4}
+.dots b:last-child{width:3px;height:3px;box-shadow:0 0 4px currentColor}
+.svc.unknown .dots b{background:rgba(177,156,217,.2)!important}
+
 /* status tag */
 .status{
   display:inline-flex;align-items:center;gap:8px;
@@ -655,9 +674,12 @@ services.forEach((s,i)=>{
       <div class="name">${s.name}</div>
       <div class="desc">${s.desc}</div>
     </div>
-    <div class="vu" aria-hidden="true">
-      <span></span><span></span><span></span><span></span>
-      <span></span><span></span><span></span><span></span>
+    <div class="meters" aria-hidden="true">
+      <div class="vu">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+      <div class="dots" data-dots></div>
     </div>
     <div class="freq">
       Tuned to
@@ -707,6 +729,18 @@ async function refresh(){
     const up = uptime24!=null ? (uptime24*100).toFixed(2)+'%' : '—';
     const ping = last?.ping!=null ? last.ping+' ms' : '— ms';
     el.querySelector('[data-uptime]').textContent = `${up} · ${ping}`;
+
+    // last 24 heartbeats as pinprick dots
+    const dots = el.querySelector('[data-dots]');
+    if(dots){
+      const recent = beats.slice(-24);
+      const padded = Array(Math.max(0,24-recent.length)).fill(null).concat(recent);
+      dots.innerHTML = padded.slice(0,24).map(b=>{
+        const s = b?.status ?? -1;
+        const label = b ? `${b.time} · ${s===1?'up':s===0?'down':s===2?'pending':s===3?'maint':'?'}${b.ping!=null?' · '+b.ping+'ms':''}` : 'no data';
+        return `<b data-s="${s}" title="${label}"></b>`;
+      }).join('');
+    }
   });
 }
 refresh();
