@@ -333,10 +333,8 @@ h1 .badge{font:clamp(11px,1.2vw,16px)/1 var(--display);font-style:normal;letter-
 <script>
 /* ============ config ============ */
 const KUMA='https://status.squibbl.com', SLUG='squibbl';
-// PROD: '/api/onair' served by the onair container on .101 (keys stay server-side).
-// PROTOTYPE: inlined snapshot captured from the real stack.
-const ONAIR_URL=null;
-const SNAPSHOT={"generated": "2026-09-28T02:16Z", "listeners": 0, "episodes": [{"kind": "ep", "when": "2026-09-28T10:00:00Z", "show": "Futurama", "code": "S11E10", "title": "Final Ending: The Last Conclusion", "net": "Hulu", "have": true, "poster": "https://artworks.thetvdb.com/banners/posters/73871-2.jpg"}, {"kind": "ep", "when": "2026-09-29T02:00:00Z", "show": "It's Always Sunny in Philadelphia", "code": "S18E08", "title": "Mac and Dennis Tear Their ACLs", "net": "FXX", "have": false, "poster": "https://artworks.thetvdb.com/banners/posters/75805-12.jpg"}, {"kind": "ep", "when": "2026-09-30T04:00:00Z", "show": "Ted Lasso", "code": "S04E09", "title": "Mae Rides the Bus", "net": "Apple TV", "have": false, "poster": "https://artworks.thetvdb.com/banners/v4/series/383203/posters/61010b6167190.jpg"}, {"kind": "ep", "when": "2026-10-01T00:00:00Z", "show": "Scrubs (2026)", "code": "S02E01", "title": "My First Time in a While", "net": "ABC (US)", "have": false, "poster": "https://artworks.thetvdb.com/banners/v4/series/465690/posters/69693b1200cc2.jpg"}, {"kind": "ep", "when": "2026-10-01T00:21:00Z", "show": "Scrubs (2026)", "code": "S02E02", "title": "My Mentee", "net": "ABC (US)", "have": false, "poster": "https://artworks.thetvdb.com/banners/v4/series/465690/posters/69693b1200cc2.jpg"}, {"kind": "ep", "when": "2026-10-01T02:00:00Z", "show": "South Park", "code": "S29E02", "title": "TBA", "net": "Comedy Central", "have": false, "poster": "https://artworks.thetvdb.com/banners/posters/75897-5.jpg"}, {"kind": "ep", "when": "2026-10-01T20:00:00Z", "show": "All Creatures Great & Small (2020)", "code": "S07E03", "title": "The Owl and the Pussycats", "net": "5", "have": false, "poster": "https://artworks.thetvdb.com/banners/series/378982/posters/5f461d9a9dd00.jpg"}, {"kind": "ep", "when": "2026-10-02T04:00:00Z", "show": "Dark Matter (2024)", "code": "S02E06", "title": "What the Universe Is Made Of", "net": "Apple TV", "have": false, "poster": "https://artworks.thetvdb.com/banners/v4/series/393159/posters/66192e346b768.jpg"}, {"kind": "ep", "when": "2026-10-02T07:00:00Z", "show": "MobLand", "code": "S02E03", "title": "Bonzo Goes to Bitburg", "net": "Paramount+", "have": false, "poster": "https://artworks.thetvdb.com/banners/v4/series/446831/posters/67eaec7feed20.jpg"}, {"kind": "ep", "when": "2026-10-03T00:00:00Z", "show": "Outlander: Blood of My Blood", "code": "S02E03", "title": "Rabbits Don't Swim", "net": "STARZ", "have": false, "poster": "https://artworks.thetvdb.com/banners/v4/series/429964/posters/694f0ebef17f0.jpg"}, {"kind": "ep", "when": "2026-10-05T00:00:00Z", "show": "The Simpsons", "code": "S38E02", "title": "Diary of a Chimpy Kid", "net": "FOX", "have": false, "poster": "https://artworks.thetvdb.com/banners/posters/71663-15.jpg"}, {"kind": "ep", "when": "2026-10-06T02:00:00Z", "show": "It's Always Sunny in Philadelphia", "code": "S18E09", "title": "Frank's Team: A Dark Day for Baseball", "net": "FXX", "have": false, "poster": "https://artworks.thetvdb.com/banners/posters/75805-12.jpg"}], "films": [{"kind": "film", "when": "2026-07-21T00:00:00Z", "show": "Masters of the Universe", "year": 2026, "have": true, "poster": "https://image.tmdb.org/t/p/original/oRuyGUHdoaQxWP3SDfafGkStxTC.jpg"}, {"kind": "film", "when": "2026-09-29T00:00:00Z", "show": "Spider-Man: Brand New Day", "year": 2026, "have": false, "poster": "https://image.tmdb.org/t/p/original/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg"}, {"kind": "film", "when": "2026-10-13T00:00:00Z", "show": "Practical Magic 2", "year": 2026, "have": false, "poster": "https://image.tmdb.org/t/p/original/ogwQOLbCfncjvBhFb5l0OmQH8KC.jpg"}, {"kind": "film", "when": "2026-09-30T00:00:00Z", "show": "Verity", "year": 2026, "have": false, "poster": "https://image.tmdb.org/t/p/original/OMOla28weCA94NRGQHLjGqvSS1.jpg"}], "live": [{"start": "2026-09-28T00:15:00Z", "stop": "2026-09-28T03:30:00Z", "ch": "NBCNY USA", "title": "NFL Football"}, {"start": "2026-09-28T01:00:00Z", "stop": "2026-09-28T04:00:00Z", "ch": "MSNBC", "title": "The Assignment With Antonia Hylton"}, {"start": "2026-09-28T01:00:00Z", "stop": "2026-09-28T07:30:00Z", "ch": "NFL RedZone", "title": "NFL RedZone"}, {"start": "2026-09-28T01:00:00Z", "stop": "2026-09-28T03:00:00Z", "ch": "Fox Sports 1 USA", "title": "Horse Racing"}, {"start": "2026-09-28T01:30:00Z", "stop": "2026-09-28T04:00:00Z", "ch": "TUDN USA", "title": "F\u00fatbol Mexicano Primera Divisi\u00f3n"}, {"start": "2026-09-28T02:00:00Z", "stop": "2026-09-28T05:00:00Z", "ch": "BeIN SPORTS USA", "title": "GT World Challenge America"}, {"start": "2026-09-28T02:00:00Z", "stop": "2026-09-28T04:00:00Z", "ch": "ACC Network USA", "title": "Women's College Volleyball"}, {"start": "2026-09-28T02:00:00Z", "stop": "2026-09-28T04:00:00Z", "ch": "ESPNU USA", "title": "Women's College Soccer"}]};
+// Live aggregate from the onair container on the box (keys stay server-side).
+const ONAIR_URL='https://onair.squibbl.com/api/onair';
 
 const SVCS=[
  {id:'jellyfin',  kuma:2,name:'Jellyfin',  f:88.3,desc:'Open-source cinema · libraries & live TV',url:'https://jellyfin.squibbl.com'},
@@ -435,10 +433,13 @@ document.addEventListener('visibilitychange',()=>document.hidden?stop():start())
 const fmtT=d=>d.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
 const dayLbl=d=>{const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);const n=Math.round((x-t)/864e5);
   return n<=0?'Today':n===1?'Tomorrow':x.toLocaleDateString([],{weekday:'short'})};
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const cssUrl=u=>/^https:\/\//.test(u||'')?`url("${encodeURI(u).replace(/"/g,'%22')}")`:'none';
 function render(o){
+  o=o||{};
   const live=$('#live'); live.replaceChildren();
   const now=Date.now();
-  (o.live||[]).filter(p=>new Date(p.stop)>now).sort((a,b)=>new Date(a.start)-new Date(b.start)).slice(0,7).forEach(p=>{
+  (o.live||[]).filter(p=>new Date(p.stop)>now).slice(0,7).forEach(p=>{
     const on=new Date(p.start)<=now;
     live.append(h('li',{},
       h('span',{class:'t'},on?'Now':fmtT(new Date(p.start))),
@@ -454,27 +455,30 @@ function render(o){
     const key=x.show+x.kind; if(x.kind==='ep'&&seen.has(key)) return; seen.add(key);
     const img=x.poster.replace('/original/','/w342/');
     crate.append(h('a',{class:'rec',href:SVCS[x.have?1:2].url,target:'_blank',rel:'noopener'},
-      h('div',{class:'art',style:`background-image:url('${img}')`},
+      h('div',{class:'art',style:`background-image:${cssUrl(img)}`},
         h('span',{class:'day'},x.have?'On shelf':dayLbl(x.when)), x.have?h('span',{class:'have'},'✓'):null),
       h('h3',{},x.show.replace(/ \(\d{4}\)$/,'')),
       h('p',{},x.kind==='ep'?`${x.code} · ${x.net||''}`:`Film · ${x.year}`)));
   });
   const feature=items.find(x=>x.kind==='ep'&&!x.have)||items[0];
   if(feature){
-    $('#sleeve').style.backgroundImage=`url('${feature.poster.replace('/original/','/w500/')}')`;
+    $('#sleeve').style.backgroundImage=cssUrl(feature.poster.replace('/original/','/w500/'));
     $('#sleeveT').textContent=feature.show.replace(/ \(\d{4}\)$/,'');
     $('#sleeveS').textContent=feature.kind==='ep'?`${feature.code} · ${dayLbl(feature.when)}`:`Film · ${feature.year}`;
   }
   const tick=[`Broadcasting continuously from the living room`,`<em>91.7 FM</em>`,
-    ...(o.live||[]).slice(0,3).map(p=>`<em>Live</em>: ${p.title} on ${p.ch}`),
-    ...items.filter(x=>!x.have).slice(0,4).map(x=>`<em>Arriving ${dayLbl(x.when)}</em>: ${x.show.replace(/ \(\d{4}\)$/,'')}`),
+    ...(o.live||[]).slice(0,3).map(p=>`<em>Live</em>: ${esc(p.title)} on ${esc(p.ch)}`),
+    ...items.filter(x=>!x.have).slice(0,4).map(x=>`<em>Arriving ${dayLbl(x.when)}</em>: ${esc(x.show.replace(/ \(\d{4}\)$/,''))}`),
     `Requests taken via Jellyseerr`,`No commercials, ever`].join(' <i>·</i> ');
   $('#track').innerHTML=`<span>${tick} <i>·</i></span><span>${tick} <i>·</i></span>`;
 }
 async function loadOnAir(){
-  if(!ONAIR_URL) return render(SNAPSHOT);
-  try{const r=await fetch(ONAIR_URL,{cache:'no-store'}); render(await r.json())}catch{render({})}
+  const c=new AbortController(), t=setTimeout(()=>c.abort(),8000);
+  try{const r=await fetch(ONAIR_URL,{signal:c.signal}); if(!r.ok) throw 0; render(await r.json())}
+  catch{ document.getElementById('onair').hidden=true; document.getElementById('coming').hidden=true; render({}) }
+  finally{clearTimeout(t)}
 }
+setInterval(()=>{ if(!document.hidden) loadOnAir() }, 120000);
 loadOnAir();
 
 /* ============ how to tune in ============ */
