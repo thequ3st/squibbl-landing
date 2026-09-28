@@ -83,7 +83,7 @@ h1 .badge{font:clamp(11px,1.2vw,16px)/1 var(--display);font-style:normal;letter-
 .btn:not(.solid):hover{border-color:var(--tang);color:var(--tang)}
 
 /* turntable — tonearm actually on the record */
-.deck{position:relative;contain:paint;aspect-ratio:1/1;width:100%;max-width:460px;justify-self:end}
+.deck{position:relative;aspect-ratio:1/1;width:100%;max-width:460px;justify-self:end}
 .platter{position:absolute;top:0;right:0;overflow:hidden;width:84%;aspect-ratio:1;border-radius:50%;background:var(--ink-2);
   box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 0 1.5px var(--hair)}
 .vinyl{position:absolute;inset:3%;border-radius:50%;
@@ -105,7 +105,7 @@ h1 .badge{font:clamp(11px,1.2vw,16px)/1 var(--display);font-style:normal;letter-
 .deck.idle .arm i{transform:rotate(92deg)} .deck.idle .vinyl{animation-play-state:paused}
 .sleeve{position:absolute;left:0;bottom:0;width:56%;aspect-ratio:1;transform:rotate(-4deg);z-index:2;
   border:2px solid var(--cream);background:var(--ink-3) center/cover no-repeat;box-shadow:0 26px 44px -18px rgba(0,0,0,.8);overflow:hidden}
-.sleeve::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,13,20,0) 45%,rgba(11,13,20,.92))}
+.sleeve::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,13,20,0) 30%,rgba(11,13,20,.75) 55%,rgba(11,13,20,.97))}
 .sleeve .cap{position:absolute;left:14px;right:14px;bottom:12px;z-index:1}
 .sleeve .cap small{display:block;font:9px var(--display);letter-spacing:.28em;color:var(--tang);text-transform:uppercase;margin-bottom:6px}
 .sleeve .cap b{display:block;font:italic 400 clamp(18px,2.2vw,26px)/1 var(--serif);color:var(--cream)}
